@@ -35,6 +35,13 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
+  function base64ToUtf8(base64: string) {
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    const decoder = new TextDecoder('utf-8');
+    return decoder.decode(bytes);
+  }
+
   useEffect(() => {
     try {
       const base64Data = searchParams.get("data")
@@ -46,7 +53,7 @@ export default function ChatPage() {
       }
 
       // Decode base64 to string
-      const jsonString = atob(base64Data)
+      const jsonString = base64ToUtf8(base64Data)
 
       // Parse JSON
       const parsedData = JSON.parse(jsonString)

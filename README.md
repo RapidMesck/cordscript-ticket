@@ -63,6 +63,15 @@ Visit the home page and click **"Try Example"** to preview a sample ticket.
 
 This project includes a server component (`[slug]/page.tsx`) to handle short URL redirection from a PostgreSQL database. Set the `DATABASE_URL` environment variable to enable it.
 
+`links` database schema:
+
+```md
+id: INT
+slug: VARCHAR
+url: TEXT
+created_at: TIMESTAMP WITH TIME ZONE
+```
+
 ```env
 DATABASE_URL=postgres://user:pass@host:port/db
 ```

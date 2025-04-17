@@ -37,9 +37,8 @@ export default function ChatPage() {
 
   function base64ToUtf8(base64: string) {
     const binary = atob(base64);
-    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
-    const decoder = new TextDecoder('utf-8');
-    return decoder.decode(bytes);
+    const bytes = Uint8Array.from([...binary].map(c => c.charCodeAt(0)));
+    return new TextDecoder('utf-8').decode(bytes);
   }
 
   useEffect(() => {

@@ -125,7 +125,7 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#36393f]">
       <header className="bg-[#2f3136] border-b border-[#202225] p-4 shadow-sm">
-        <h1 className="text-white font-semibold">Support Ticket</h1>
+        <h1 className="text-white font-semibold">CordScript - Ticket</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto p-4">
@@ -150,7 +150,12 @@ export default function ChatPage() {
                   >
                     {firstMessage.author}
                   </span>
-                  <span className="ml-2 text-xs text-gray-400">{timeAgo}</span>
+                  <span 
+                    className="ml-2 text-xs text-gray-400" 
+                    title={date.toLocaleString()}
+                  >
+                    {timeAgo}
+                  </span>
                 </div>
 
                 {/* Message content */}

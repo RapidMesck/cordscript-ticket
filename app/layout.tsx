@@ -19,6 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <div className="fixed bottom-4 right-4">
+          <GithubButton />
+        </div>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
@@ -29,3 +32,4 @@ export default function RootLayout({
 
 
 import './globals.css'
+import GithubButton from "@/components/github-button"

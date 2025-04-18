@@ -35,10 +35,26 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  function base64ToUtf8(base64: string) {
-    const binary = atob(base64);
-    const bytes = Uint8Array.from([...binary].map(c => c.charCodeAt(0)));
-    return new TextDecoder('utf-8').decode(bytes);
+  // Improved base64 decoding function that handles URL-safe base64
+  function decodeBase64(base64: string) {
+    try {
+      // Replace URL-safe characters and add padding if needed
+      const normalized = base64
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")
+        .padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=")
+
+      // Decode the base64 string
+      const binary = atob(normalized)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i)
+      }
+      return new TextDecoder("utf-8").decode(bytes)
+    } catch (err) {
+      console.error("Base64 decoding error:", err)
+      throw new Error("Failed to decode base64 data")
+    }
   }
 
   useEffect(() => {
@@ -51,8 +67,8 @@ export default function ChatPage() {
         return
       }
 
-      // Decode base64 to string
-      const jsonString = base64ToUtf8(base64Data)
+      // Decode base64 to string using the improved function
+      const jsonString = decodeBase64(base64Data)
 
       // Parse JSON
       const parsedData = JSON.parse(jsonString)
@@ -63,6 +79,7 @@ export default function ChatPage() {
         setError("Invalid data format. Expected an array of messages.")
       }
     } catch (err) {
+      console.error("Error processing data:", err)
       setError("Failed to decode or parse data. Make sure it's valid base64-encoded JSON.")
     } finally {
       setLoading(false)
@@ -114,9 +131,29 @@ export default function ChatPage() {
           <p className="text-gray-400 text-sm mb-4">
             Encode your JSON data as base64 and add it to the URL as a query parameter:
           </p>
-          <code className="block p-3 bg-[#202225] text-gray-300 rounded text-xs overflow-x-auto">
-            /chat?data=eyJ0aW1lc3RhbXAiOiIuLi4ifQ==
-          </code>
+          <div className="mb-3">
+            <h4 className="text-gray-300 text-xs mb-1">Example JSON:</h4>
+            <code className="block p-2 bg-[#202225] text-gray-300 rounded text-xs overflow-x-auto">
+              {`[{"timestamp":"4/18/2025, 11:16:26 AM","userType":"System","author":"system","content":"Hello world"}]`}
+            </code>
+          </div>
+          <div>
+            <h4 className="text-gray-300 text-xs mb-1">URL with encoded data:</h4>
+            <code className="block p-2 bg-[#202225] text-gray-300 rounded text-xs overflow-x-auto whitespace-normal break-all">
+              /chat?data=W3sidGltZXN0YW1wIjoiNC8xOC8yMDI1LCAxMToxNjoyNiBBTSIsInVzZXJUeXBlIjoiU3lzdGVtIiwiYXV0aG9yIjoic3lzdGVtIiwiY29udGVudCI6IkhlbGxvIHdvcmxkIn1d
+            </code>
+          </div>
+        </div>
+        <div className="mt-4 p-4 bg-[#2f3136] rounded-md max-w-lg w-full">
+          <h3 className="text-gray-200 font-medium mb-2">Debugging Tools:</h3>
+          <a
+            href="https://www.base64encode.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline text-sm"
+          >
+            Base64 Encoder/Decoder Tool
+          </a>
         </div>
       </div>
     )
@@ -150,10 +187,7 @@ export default function ChatPage() {
                   >
                     {firstMessage.author}
                   </span>
-                  <span 
-                    className="ml-2 text-xs text-gray-400" 
-                    title={date.toLocaleString()}
-                  >
+                  <span className="ml-2 text-xs text-gray-400" title={date.toLocaleString()}>
                     {timeAgo}
                   </span>
                 </div>
@@ -162,7 +196,11 @@ export default function ChatPage() {
                 <div className="pl-1">
                   {group.map((message, messageIndex) => (
                     <div key={messageIndex} className="mb-1">
-                      {message.content && <p className="text-gray-200 break-words">{message.content}</p>}
+                      {message.content && (
+                        <p className="text-gray-200 break-words whitespace-pre-wrap">
+                          {message.content.replace(/`{2,3}(.*?)`{2,3}/gs, (_, code) => `\`${code}\``)}
+                        </p>
+                      )}
 
                       {/* Attachments */}
                       {message.attachments && message.attachments.length > 0 && (

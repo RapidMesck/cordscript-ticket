@@ -76,6 +76,18 @@ created_at: TIMESTAMP WITH TIME ZONE
 DATABASE_URL=postgres://user:pass@host:port/db
 ```
 
+## 📦 Exemple Base64 encode function
+
+```ts
+  function encodeBase64UrlSafe(str: string) {
+      // First, encode to regular base64
+      const base64 = Buffer.from(str).toString('base64');
+      
+      // Make it URL-safe by replacing + with - and / with _
+      return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+```
+
 ## 🛠️ Setup & Development
 
 ```bash
